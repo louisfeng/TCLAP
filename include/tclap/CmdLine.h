@@ -447,7 +447,14 @@ inline void CmdLine::parse(std::vector<std::string>& args)
 	int estat = 0;
 
 	try {
-		_progName = args.front();
+        std::string progPath = args.front();
+        const size_t progNameIndex = progPath.find_last_of("\\/");
+        if (std::string::npos != progNameIndex) {
+            _progName = progPath.substr(progNameIndex + 1);
+        }
+        else {
+            _progName = progPath;
+        }
 		args.erase(args.begin());
 
 		int requiredCount = 0;

@@ -110,17 +110,22 @@ inline void StdOutput::version(CmdLineInterface& _cmd)
 	std::string progName = _cmd.getProgramName();
 	std::string xversion = _cmd.getVersion();
 
-	std::cout << std::endl << progName << "  version: " 
-			  << xversion << std::endl << std::endl;
+	std::cout << progName << std::endl
+              << "Version: " 
+			  << xversion << std::endl;
 }
 
 inline void StdOutput::usage(CmdLineInterface& _cmd ) 
 {
-	std::cout << std::endl << "USAGE: " << std::endl << std::endl; 
+	std::string message = _cmd.getMessage();
+	std::cout << "Description: " << std::endl; 
+	spacePrint( std::cout, message, 75, 2, 0 );
+
+	std::cout << std::endl << "Usage: " << std::endl; 
 
 	_shortUsage( _cmd, std::cout );
 
-	std::cout << std::endl << std::endl << "Where: " << std::endl << std::endl;
+	std::cout  << std::endl << "Where: " << std::endl;
 
 	_longUsage( _cmd, std::cout );
 
@@ -161,7 +166,7 @@ StdOutput::_shortUsage( CmdLineInterface& _cmd,
 	XorHandler xorHandler = _cmd.getXorHandler();
 	std::vector< std::vector<Arg*> > xorList = xorHandler.getXorList();
 
-	std::string s = progName + " ";
+	std::string s = progName;
 
 	// first the xor
 	for ( int i = 0; static_cast<unsigned int>(i) < xorList.size(); i++ )
@@ -180,11 +185,11 @@ StdOutput::_shortUsage( CmdLineInterface& _cmd,
 			s += " " + (*it)->shortID();
 
 	// if the program name is too long, then adjust the second line offset 
-	int secondLineOffset = static_cast<int>(progName.length()) + 2;
+	int secondLineOffset = static_cast<int>(progName.length()) + 1;
 	if ( secondLineOffset > 75/2 )
 		secondLineOffset = static_cast<int>(75/2);
 
-	spacePrint( os, s, 75, 3, secondLineOffset );
+	spacePrint( os, s, 75, 2, secondLineOffset );
 }
 
 inline void 
@@ -192,7 +197,6 @@ StdOutput::_longUsage( CmdLineInterface& _cmd,
 					   std::ostream& os ) const
 {
 	std::list<Arg*> argList = _cmd.getArgList();
-	std::string message = _cmd.getMessage();
 	XorHandler xorHandler = _cmd.getXorHandler();
 	std::vector< std::vector<Arg*> > xorList = xorHandler.getXorList();
 
@@ -203,27 +207,21 @@ StdOutput::_longUsage( CmdLineInterface& _cmd,
 				  it != xorList[i].end(); 
 				  it++ )
 				{
-					spacePrint( os, (*it)->longID(), 75, 3, 3 );
+					spacePrint( os, (*it)->longID(), 75, 2, 2 );
 					spacePrint( os, (*it)->getDescription(), 75, 5, 0 );
 
 					if ( it+1 != xorList[i].end() )
 						spacePrint(os, "-- OR --", 75, 9, 0);
 				}
-			os << std::endl << std::endl;
 		}
 
 	// then the rest
 	for (ArgListIterator it = argList.begin(); it != argList.end(); it++)
 		if ( !xorHandler.contains( (*it) ) )
 			{
-				spacePrint( os, (*it)->longID(), 75, 3, 3 ); 
+				spacePrint( os, (*it)->longID(), 75, 2, 2 ); 
 				spacePrint( os, (*it)->getDescription(), 75, 5, 0 ); 
-				os << std::endl;
 			}
-
-	os << std::endl;
-
-	spacePrint( os, message, 75, 3, 0 );
 }
 
 inline void StdOutput::spacePrint( std::ostream& os, 
